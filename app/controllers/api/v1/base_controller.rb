@@ -17,7 +17,7 @@ class Api::V1::BaseController < ApplicationController
     begin
       decoded_token = JwtService.decode(token)
       user_id = decoded_token["user_id"]
-
+      debugger
       @current_user = User.find(user_id)
     rescue JWT::ExpiredSignature
       render json: {
