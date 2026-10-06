@@ -95,6 +95,7 @@
     <orderEntry type="library" scope="PROVIDED" name="addressable (v2.9.0, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ast (v2.4.3, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="base64 (v0.3.0, RVM: ruby-3.4.11) [gem]" level="application" />
+    <orderEntry type="library" scope="TEST" name="bcrypt (v3.1.22, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bcrypt_pbkdf (v1.1.2, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bigdecimal (v4.1.3, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bindex (v0.8.1, RVM: ruby-3.4.11) [gem]" level="application" />
@@ -126,6 +127,7 @@
     <orderEntry type="library" scope="PROVIDED" name="irb (v1.18.0, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="jbuilder (v2.15.1, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="json (v3.0.2, RVM: ruby-3.4.11) [gem]" level="application" />
+    <orderEntry type="library" scope="TEST" name="jwt (v3.3.0, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="kamal (v2.12.0, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="language_server-protocol (v3.17.0.6, RVM: ruby-3.4.11) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="lint_roller (v1.1.0, RVM: ruby-3.4.11) [gem]" level="application" />
