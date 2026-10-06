@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  patient: one
+  doctor: one
+  scheduled_at: 2026-10-06 21:01:54
+  status: MyString
+  reason: MyText
+
+two:
+  patient: two
+  doctor: two
+  scheduled_at: 2026-10-06 21:01:54
+  status: MyString
+  reason: MyText

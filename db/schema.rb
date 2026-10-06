@@ -14,4 +14,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_155239) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "appointments", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.bigint "doctor_id", null: false
+    t.datetime "scheduled_at"
+    t.string "status"
+    t.text "reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["doctor_id"], name: "index_appointments_on_doctor_id"
+    t.index ["patient_id"], name: "index_appointments_on_patient_id"
+  end
+
+  create_table "doctors", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "phone"
+    t.string "specialization"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "patients", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "phone"
+    t.date "dob"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "gender", null: false
+  end
+
+  add_foreign_key "appointments", "doctors"
+  add_foreign_key "appointments", "patients"
 end
