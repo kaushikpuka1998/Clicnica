@@ -1,4 +1,6 @@
 class Api::V1::DoctorsController < Api::V1::BaseController
+  include RequireDoctorOrAdmin
+
   def index
     render_paginated(Doctor.all)
   end
