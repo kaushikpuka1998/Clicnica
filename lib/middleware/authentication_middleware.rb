@@ -9,7 +9,7 @@ class AuthenticationMiddleware
     request = Rack::Request.new(env)
     Rails.logger.info("Request: #{request.request_method} #{request.path}")
     if !PUBLIC_PATHS.include?(request.path) && request.get_header("HTTP_AUTHORIZATION").blank?
-      return [401, { "content-type" => "application/json" }, [{ error: "Unauthorized" }.to_json]]
+      return [ 401, { "content-type" => "application/json" }, [ { error: "Unauthorized" }.to_json ] ]
     end
 
     @app.call(env)

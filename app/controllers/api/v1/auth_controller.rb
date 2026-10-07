@@ -1,17 +1,10 @@
 class Api::V1::AuthController < ApplicationController
   def register
-    user = User.new(register_params)
+    user = RegisterUser.new(register_params, profile_params).call
 
-    if user.save
-      render json: {
-        message: "Successfully registered",
-        user: user.as_json(except: :password_digest)
-      }, status: 200
-    else
-      render json: {
-        errors: user.errors.full_messages
-      }, status: 422
-    end
+    render json: user.as_json(except: :password_digest, include: %i[doctor patient]), status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
   end
 
   def login
@@ -29,7 +22,6 @@ class Api::V1::AuthController < ApplicationController
         errors: [ "Invalid email or password" ]
       }, status: :unauthorized
     end
-
   end
 
   private
@@ -42,5 +34,17 @@ class Api::V1::AuthController < ApplicationController
       :password_confirmation,
       :role
     )
+  end
+
+  def profile_params
+    params.require(:user).permit(:phone,
+                                 :specialization,
+                                 :dob,
+                                 :gender,
+                                 :name,
+                                 :email,
+                                 :password,
+                                 :password_confirmation,
+                                 :role)
   end
 end

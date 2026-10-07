@@ -71,8 +71,24 @@ Base path: `/api/v1`. Request bodies are JSON (`Content-Type: application/json`)
 
 | Method | Path                     | Body                                                                 |
 |--------|--------------------------|----------------------------------------------------------------------|
-| POST   | `/api/v1/auth/register`  | `{ "user": { name, email, password, password_confirmation, role } }` |
+| POST   | `/api/v1/auth/register`  | `{ "user": { name, email, password, password_confirmation, role, ...profile fields } }` |
 | POST   | `/api/v1/auth/login`     | `{ "email": "...", "password": "..." }`                              |
+
+`role` is `admin`, `doctor` or `patient`. For `doctor` / `patient` the matching profile is created in the
+same transaction (`RegisterUser` service), copying `name` and `email` from the user:
+
+| Role      | Extra fields inside `user`            |
+|-----------|---------------------------------------|
+| `doctor`  | `phone`, `specialization` (all required) |
+| `patient` | `phone`, `dob`, `gender` (all required)  |
+
+User and profile are validated together, so one response lists every missing field. Nothing is saved
+unless everything is valid:
+
+```json
+422 { "errors": ["Doctor phone can't be blank", "Doctor specialization can't be blank", "Email can't be blank"] }
+```
+Success returns `201` with the user and its `doctor` / `patient` profile.
 
 Login returns a JWT (`HS512`, expires in 24 hours):
 

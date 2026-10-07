@@ -1,7 +1,7 @@
 class JwtService
   SECRET_KEY = Rails.application.secret_key_base
 
-  ALGORITHM = 'HS512'
+  ALGORITHM = "HS512"
 
   def self.encode(payload)
     payload = payload.merge(exp: 24.hours.from_now.to_i)

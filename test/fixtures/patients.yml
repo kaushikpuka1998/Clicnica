@@ -1,6 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  user: patient_one
   name: MyString
   email: MyString
   phone: MyString
@@ -8,6 +9,7 @@ one:
   gender: male
 
 two:
+  user: patient_two
   name: MyString
   email: MyString
   phone: MyString

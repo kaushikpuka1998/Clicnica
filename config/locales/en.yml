@@ -29,3 +29,9 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      patient:
+        dob: "Date of birth"
+      user/patient:
+        dob: "Patient date of birth"

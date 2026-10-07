@@ -1,5 +1,4 @@
 class Api::V1::DoctorsController < Api::V1::BaseController
-
   def index
     render_paginated(Doctor.all)
   end

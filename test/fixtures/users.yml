@@ -1,13 +1,23 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+doctor_one:
+  name: Doctor One
+  email: doctor1@example.com
+  password_digest: <%= BCrypt::Password.create("secret123") %>
+  role: doctor
 
-one:
-  name: MyString
-  email: MyString
-  password_digest: MyString
-  role: MyString
+doctor_two:
+  name: Doctor Two
+  email: doctor2@example.com
+  password_digest: <%= BCrypt::Password.create("secret123") %>
+  role: doctor
 
-two:
-  name: MyString
-  email: MyString
-  password_digest: MyString
-  role: MyString
+patient_one:
+  name: Patient One
+  email: patient1@example.com
+  password_digest: <%= BCrypt::Password.create("secret123") %>
+  role: patient
+
+patient_two:
+  name: Patient Two
+  email: patient2@example.com
+  password_digest: <%= BCrypt::Password.create("secret123") %>
+  role: patient

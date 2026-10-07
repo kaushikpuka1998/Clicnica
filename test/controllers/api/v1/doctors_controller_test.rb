@@ -2,7 +2,7 @@ require "test_helper"
 
 class Api::V1::DoctorsControllerTest < ActionDispatch::IntegrationTest
   test "index pages through every doctor once using the cursor" do
-    3.times { |i| Doctor.create!(name: "Doc #{i}") }
+    3.times { |i| Doctor.create!(name: "Doc #{i}", phone: "1", specialization: "GP", user: User.create!(name: "Doc #{i}", email: "doc#{i}@example.com", password: "secret123", role: "doctor")) }
     user = User.create!(name: "Admin", email: "admin@example.com", password: "secret123", role: "admin")
     headers = { "Authorization" => "Bearer #{JwtService.encode(user_id: user.id)}" }
 
