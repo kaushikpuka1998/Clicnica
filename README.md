@@ -26,10 +26,12 @@ Create a `.env` file in the project root (loaded by `dotenv-rails`):
 
 ```bash
 PATIENT_CLINIC_API_DATABASE_PASSWORD=your_postgres_password
-DATABASE_URL=postgresql://localhost:5432/patient_clinic_api_development
 ```
 
 The app connects as the `postgres` user (see `config/database.yml`).
+
+Don't put `DATABASE_URL` in `.env`: it overrides every environment, so the test suite
+would run against (and wipe) the development database.
 
 ## Database
 
@@ -37,7 +39,8 @@ The app connects as the `postgres` user (see `config/database.yml`).
 bin/rails db:create db:migrate
 ```
 
-Reset from scratch (close DB clients like DBeaver first, or the drop fails with `ObjectInUse`):
+Reset from scratch. In development, `db:drop` / `db:reset` first disconnect other sessions
+(DBeaver, the running server) via `bin/rails db:terminate_connections` (`lib/tasks/db.rake`):
 
 ```bash
 bin/rails db:drop db:create db:migrate
@@ -110,6 +113,93 @@ flowchart TD
         L --> M["Controller action runs<br/>(current_user available)"]
     end
 ```
+
+### Pagination (cursor based)
+
+`GET /api/v1/patients`, `/api/v1/doctors` and `/api/v1/appointments` are paginated with an
+**opaque, encrypted cursor**, not page numbers or offsets.
+
+#### Why cursor instead of offset
+
+| | Offset (`?page=5`) | Cursor (`?cursor=...`) |
+|---|---|---|
+| Query | `OFFSET 80 LIMIT 20`: DB reads and throws away 80 rows | `WHERE id > last_id LIMIT 20`: index jump, same speed on every page |
+| Rows inserted/deleted while paging | Rows get skipped or shown twice | Stable, each row appears once |
+| Jump to an arbitrary page | Yes | No, only "next page" |
+
+#### Request
+
+| Param    | Default | Notes |
+|----------|---------|-------|
+| `limit`  | 20      | Page size, clamped to 1–100 |
+| `cursor` | none    | `next_cursor` from the previous response. Omit for the first page |
+
+#### Response
+
+```json
+{
+  "data": [ { "id": 1, "name": "Dr. Amit Sharma" }, { "id": 2, "name": "..." } ],
+  "next_cursor": "1g--kUZG9hjvJVFgBCDs--rzqulTwQTlXzUQCi7rmAww",
+  "has_more": true
+}
+```
+
+| Field         | Meaning |
+|---------------|---------|
+| `data`        | Records for this page, ordered by `id` ascending |
+| `next_cursor` | Token for the next page; `null` on the last page |
+| `has_more`    | `true` if another page exists |
+
+#### Walking through pages
+
+```bash
+# page 1
+curl "http://localhost:3000/api/v1/doctors?limit=2" -H "Authorization: Bearer $TOKEN"
+# => { "data": [id 1, id 2], "next_cursor": "<token A>", "has_more": true }
+
+# page 2
+curl "http://localhost:3000/api/v1/doctors?limit=2&cursor=<token A>" -H "Authorization: Bearer $TOKEN"
+# => { "data": [id 3, id 4], "next_cursor": "<token B>", "has_more": true }
+
+# last page
+curl "http://localhost:3000/api/v1/doctors?limit=2&cursor=<token B>" -H "Authorization: Bearer $TOKEN"
+# => { "data": [id 5], "next_cursor": null, "has_more": false }
+```
+
+Keep the same `limit` across pages and stop when `has_more` is `false`.
+
+#### How it works
+
+```mermaid
+flowchart TD
+    A["GET /api/v1/doctors?limit=20&cursor=token"] --> B{"cursor present?"}
+    B -- no --> D["all rows"]
+    B -- yes --> C["MessageEncryptor.decrypt_and_verify(cursor)"]
+    C -- tampered / invalid --> C1["400 Invalid cursor"]
+    C -- ok --> D2["WHERE id > last_id"]
+    D --> E["ORDER BY id LIMIT limit + 1"]
+    D2 --> E
+    E --> F{"got limit + 1 rows?"}
+    F -- yes --> G["drop the extra row<br/>has_more = true<br/>next_cursor = encrypt(last row id)"]
+    F -- no --> H["has_more = false<br/>next_cursor = null"]
+    G --> I["200 { data, next_cursor, has_more }"]
+    H --> I
+```
+
+- **One extra row:** fetching `limit + 1` shows whether a next page exists without a `COUNT(*)` query.
+- **Encrypted cursor:** the last id is encrypted with `ActiveSupport::MessageEncryptor` (key derived from
+  `secret_key_base`), so clients can't read, guess or edit it. Changing `secret_key_base` invalidates
+  old cursors; clients just start again from page 1.
+- **Code:** `render_paginated` in `app/controllers/api/v1/base_controller.rb`. Any controller under
+  `Api::V1::BaseController` can paginate any scope, e.g. `render_paginated(Doctor.all)` or
+  `render_paginated(Appointment.where(doctor_id: params[:doctor_id]))`.
+
+#### Errors
+
+| Case | Response |
+|------|----------|
+| Cursor edited, truncated or made up | `400 { "error": "Invalid cursor" }` |
+| Missing / invalid auth token | `401` (see [Authentication flow](#authentication-flow)) |
 
 ### Patients
 

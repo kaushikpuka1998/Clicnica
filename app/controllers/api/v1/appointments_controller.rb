@@ -1,12 +1,6 @@
 class Api::V1::AppointmentsController < Api::V1::BaseController
   def index
-    appointments = Appointment.all
-
-    if appointments.size > 0
-      render json: appointments
-    else
-      render json: {}
-    end
+    render_paginated(Appointment.all)
 
   rescue StandardError => e
     render json: e.to_s, status: :internal_server_error

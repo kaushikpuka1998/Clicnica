@@ -1,16 +1,16 @@
 class Api::V1::DoctorsController < Api::V1::BaseController
 
   def index
-    doctors = Doctor.all
-    render json: doctors
+    render_paginated(Doctor.all)
   end
 
   def show
-    doctor = Doctor.where(id: params[:id])
-    if doctor.size > 0
-      render json: doctor
-    else
+    doctor = Doctor.where(id: params[:id]).last
+
+    if doctor.nil?
       render json: { data: "No Doctor Found" }
+    else
+      render json: doctor
     end
   end
 

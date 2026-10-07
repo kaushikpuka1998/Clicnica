@@ -5,9 +5,11 @@ one:
   email: MyString
   phone: MyString
   dob: 2026-10-06
+  gender: male
 
 two:
   name: MyString
   email: MyString
   phone: MyString
   dob: 2026-10-06
+  gender: male

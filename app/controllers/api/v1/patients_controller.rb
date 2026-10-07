@@ -15,8 +15,7 @@ class Api::V1::PatientsController < Api::V1::BaseController
   end
 
   def index
-    patients = Patient.all
-    render json: patients, status: :ok
+    render_paginated(Patient.all)
   rescue StandardError => e
     Rails.logger.error(e.message)
     render json: {
